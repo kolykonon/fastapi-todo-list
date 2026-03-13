@@ -17,7 +17,7 @@ class Task(Base, IDMixin, TimeStampMixin):
     """Класс, описывающий задачу в базе данных"""
 
     title: Mapped[str] = mapped_column(String(100), nullable=False)
-    description: Mapped[str] = mapped_column(Text(500), nullable=True, default="")
+    description: Mapped[Text] = mapped_column(Text, nullable=True, default="")
     status: Mapped[str] = mapped_column(
         String(20),
         default=TaskStatus.IN_PROGRESS,
