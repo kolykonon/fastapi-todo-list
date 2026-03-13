@@ -13,7 +13,6 @@ class DBHelper:
         self.session_factory = async_sessionmaker(
             bind=self.engine, autoflush=False, expire_on_commit=False
         )
-        self.session_dep = Annotated[AsyncSession, Depends(self.get_session)]
 
     async def get_session(
         self,
@@ -23,3 +22,4 @@ class DBHelper:
 
 
 db_helper = DBHelper()
+SessionDep = Annotated[AsyncSession, Depends(db_helper.get_session)]
