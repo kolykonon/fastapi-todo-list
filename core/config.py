@@ -1,8 +1,12 @@
+from pathlib import Path
 from pydantic_settings import BaseSettings
 from dotenv import load_dotenv
 import os
+from pydantic_settings import BaseSettings
 
 load_dotenv()
+
+BASE_DIR = Path(__file__).parent.parent
 
 
 class DBSettings(BaseSettings):
@@ -19,4 +23,16 @@ class DBSettings(BaseSettings):
         return f"postgresql+asyncpg://{self.DB_USER}:{self.DB_PASSWORD}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
 
 
-db_settings = DBSettings()
+class AuthJWT(BaseSettings):
+    private_key_path: Path = BASE_DIR / "certs" / "jwt-private.pem"
+    public_key_path: Path = BASE_DIR / "certs" / "jwt-public.pem"
+
+
+class Settings(BaseSettings):
+    """Общий класс настроек"""
+
+    db_settings: DBSettings = DBSettings()
+    jwt_settings: AuthJWT = AuthJWT()
+
+
+settings = Settings()
