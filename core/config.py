@@ -26,6 +26,7 @@ class DBSettings(BaseSettings):
 class AuthJWT(BaseSettings):
     private_key_path: Path = BASE_DIR / "certs" / "jwt-private.pem"
     public_key_path: Path = BASE_DIR / "certs" / "jwt-public.pem"
+    algorithm: str = "RS256"
 
 
 class Settings(BaseSettings):
