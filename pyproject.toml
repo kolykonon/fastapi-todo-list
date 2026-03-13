@@ -1,0 +1,28 @@
+[project]
+name = "fastapi-todo-list"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "kolykonon",email = "kononikhinnikolay@gmail.com"}
+]
+license = {text = "MIT"}
+requires-python = "3.13.6"
+dependencies = [
+    "fastapi (>=0.135.1,<0.136.0)",
+    "uvicorn (>=0.41.0,<0.42.0)",
+    "sqlalchemy (>=2.0.48,<3.0.0)",
+    "pydantic (>=2.12.5,<3.0.0)",
+    "pydantic-settings (>=2.13.1,<3.0.0)",
+    "asyncpg (>=0.31.0,<0.32.0)"
+]
+
+[dependency-groups]
+dev = [
+    "black (>=26.3.1,<27.0.0)",
+    "pytest (>=9.0.2,<10.0.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
