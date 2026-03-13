@@ -30,3 +30,19 @@ async def add_task(schema: TaskAddSchema, session: SessionDep):
     session.add(task)
     await session.commit()
     return task
+
+
+@router.post("/{task_id}")
+async def get_task_by_id(task_id: int, session: SessionDep) -> TaskSchema:
+    result = await session.get(Task, 1)
+    if result:
+        return TaskSchema(
+            id=result.id,
+            title=result.title,
+            description=result.description,
+            status=result.status,
+        )
+    else:
+        raise HTTPException(
+            status.HTTP_400_BAD_REQUEST, "Задача с указанным ID не найдена"
+        )
