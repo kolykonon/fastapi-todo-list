@@ -1,8 +1,13 @@
 from sqlalchemy import String, Text
+from typing import TYPE_CHECKING
 from mixins import TimeStampMixin, IDMixin
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from models import Base
+from sqlalchemy import ForeignKey
 import enum
+
+if TYPE_CHECKING:
+    from models import User
 
 
 class TaskStatus(str, enum.Enum):
@@ -23,3 +28,7 @@ class Task(Base, IDMixin, TimeStampMixin):
         default=TaskStatus.IN_PROGRESS,
         server_default=TaskStatus.IN_PROGRESS,
     )
+
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+
+    users: Mapped["User"] = relationship(back_populates="user")
