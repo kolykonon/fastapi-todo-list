@@ -1,7 +1,6 @@
 from typing import Annotated, AsyncGenerator
 from fastapi import Depends
-from config import db_settings
-from pydantic_settings import BaseSettings
+from core.config import db_settings
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 
