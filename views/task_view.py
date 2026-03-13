@@ -8,7 +8,7 @@ router = APIRouter(prefix="/tasks", tags=["Tasks"])
 
 
 @router.get("/")
-async def get_tasks(session: SessionDep) -> Sequence[Task]:
+async def get_tasks(session: SessionDep):
     """Функция для получения всех задач"""
 
     query = select(Task)
@@ -17,7 +17,7 @@ async def get_tasks(session: SessionDep) -> Sequence[Task]:
 
 
 @router.post("/")
-async def add_task(schema: TaskAddSchema, session: SessionDep) -> TaskSchema:
+async def add_task(schema: TaskAddSchema, session: SessionDep):
     """Функция для добавления задачи"""
 
     query = select(Task).where(schema.title == Task.title)
