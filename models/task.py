@@ -1,7 +1,7 @@
 from sqlalchemy import String, Text
 from mixins import TimeStampMixin, IDMixin
 from sqlalchemy.orm import Mapped, mapped_column
-from base import Base
+from models import Base
 import enum
 
 
