@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, ConfigDict, EmailStr
 
 
 class CreateUserSchema(BaseModel):
@@ -7,4 +7,9 @@ class CreateUserSchema(BaseModel):
 
 
 class UserSchema(BaseModel):
+    model_config = ConfigDict(strict=True)
+
     id: int
+    email: EmailStr
+    password: bytes
+    is_active: bool = True
