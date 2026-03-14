@@ -31,4 +31,4 @@ class Task(Base, IDMixin, TimeStampMixin):
 
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
 
-    users: Mapped["User"] = relationship(back_populates="user")
+    user: Mapped["User"] = relationship("User", back_populates="tasks")
