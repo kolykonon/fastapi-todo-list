@@ -29,3 +29,7 @@ def hash_password(password: str) -> bytes:
     salt = bcrypt.gensalt()
     pwd_bytes = password.encode()
     return bcrypt.hashpw(pwd_bytes, salt=salt)
+
+
+def validate_password(password, hashed_password) -> bool:
+    return bcrypt.checkpw(password.encode(), hashed_password=hashed_password)
