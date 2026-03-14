@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from views import tasks_router
+from api import tasks_router
 import uvicorn
 
 app = FastAPI()
