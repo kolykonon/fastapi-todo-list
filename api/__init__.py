@@ -1,3 +1,4 @@
-from api.task_view import router as tasks_router
+from api.tasks import router as tasks_router
+from api.auth import router as auth_router
 
-__all__ = "tasks_router"
+__all__ = ("tasks_router", "auth_router")
