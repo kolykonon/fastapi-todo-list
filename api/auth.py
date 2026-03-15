@@ -50,7 +50,7 @@ UserValidateDep = Annotated[User, Depends(validate_auth_user)]
 
 
 @router.post("/login/", response_model=TokenSchema)
-async def auth_user(user: UserValidateDep, response: Response):
+async def auth_user(user: UserValidateDep):
     jwt_payload = {"sub": str(user.id), "username": user.username}
     token = encode_jwt(jwt_payload)
     return TokenSchema(access_token=token, token_type="Bearer")
