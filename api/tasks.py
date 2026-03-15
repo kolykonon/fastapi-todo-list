@@ -32,7 +32,7 @@ async def add_task(schema: TaskAddSchema, session: SessionDep):
     return task
 
 
-@router.get("/{task_id}")
+@router.get("/{task_id}", response_model=TaskSchema)
 async def get_task_by_id(task_id: int, session: SessionDep) -> TaskSchema:
     result = await session.get(Task, 1)
     if result:
