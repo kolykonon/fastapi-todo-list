@@ -9,7 +9,7 @@ if TYPE_CHECKING:  # Чтобы избежать циклического имп
 
 
 class User(Base, IDMixin, TimeStampMixin):
-    email: Mapped[str] = mapped_column(unique=True, nullable=False)
-    hashed_password: Mapped[str] = mapped_column(nullable=False)
+    username: Mapped[str] = mapped_column(unique=True, nullable=False)
+    password: Mapped[str] = mapped_column(nullable=False)
     tasks: Mapped[List["Task"]] = relationship("Task", back_populates="user")
     is_active: Mapped[bool] = mapped_column(default=True)

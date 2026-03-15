@@ -2,7 +2,7 @@ from pydantic import BaseModel, ConfigDict, EmailStr
 
 
 class CreateUserSchema(BaseModel):
-    email: EmailStr
+    username: str
     password: str
 
 
@@ -10,6 +10,6 @@ class UserSchema(BaseModel):
     model_config = ConfigDict(strict=True)
 
     id: int
-    email: EmailStr
-    password: bytes
+    username: str
+    password: str
     is_active: bool = True
