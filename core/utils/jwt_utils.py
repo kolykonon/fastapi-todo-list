@@ -1,4 +1,4 @@
-import jwt
+import jwt as pyjwt
 from core import settings
 from datetime import datetime, timedelta
 import bcrypt
@@ -16,7 +16,7 @@ def encode_jwt(
     expire = datetime.now() + timedelta(minutes=expire_minutes)
     to_encode.update(exp=expire, iat=datetime.now())
 
-    encoded = jwt.encode(
+    encoded = pyjwt.encode(
         payload, private_key, algorithm=settings.jwt_settings.algorithm
     )
     return encoded
@@ -27,15 +27,15 @@ def decode_jwt(
     public_key: str = auth_jwt.public_key_path.read_text(),
     algorithm: str = auth_jwt.algorithm,
 ):
-    decoded = jwt.decode(token, public_key, algorithms=[algorithm])
+    decoded = pyjwt.decode(token, public_key, algorithms=[algorithm])
     return decoded
 
 
-def hash_password(password: str) -> bytes:
+def hash_password(password: str) -> str:
     salt = bcrypt.gensalt()
-    pwd_bytes = password.encode()
-    return bcrypt.hashpw(pwd_bytes, salt=salt)
+    pwd_bytes = password.encode("utf-8")
+    return bcrypt.hashpw(pwd_bytes, salt=salt).decode("utf-8")
 
 
-def validate_password(password, hashed_password) -> bool:
-    return bcrypt.checkpw(password.encode(), hashed_password=hashed_password)
+def validate_password(password: str, hashed_password: str):
+    return bcrypt.checkpw(password.encode("utf-8"), hashed_password.encode("utf-8"))
