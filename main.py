@@ -1,10 +1,11 @@
 from fastapi import FastAPI
-from views import tasks_router
+from api import tasks_router, auth_router
 import uvicorn
 
 app = FastAPI()
 
 app.include_router(tasks_router)
+app.include_router(auth_router)
 
 
 def start() -> None:
