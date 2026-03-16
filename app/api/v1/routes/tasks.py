@@ -1,8 +1,9 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter
 from core.db import SessionDep
-from sqlalchemy import Sequence, select
+from sqlalchemy import select, delete
 from models.task import Task
 from schemas.task import TaskAddSchema, TaskSchema
+from api.v1.exceptions import TaskNotFoundException, TaskAlreadyExistsException
 
 router = APIRouter(prefix="/tasks", tags=["Tasks"])
 
@@ -13,7 +14,11 @@ async def get_tasks(session: SessionDep):
 
     query = select(Task)
     result = await session.execute(query)
-    return result.scalars().all()
+    tasks = result.scalars().all()
+    if tasks:
+        return tasks
+    else:
+        return {"msg": "Задачи не найдены!"}
 
 
 @router.post("/")
@@ -23,9 +28,7 @@ async def add_task(schema: TaskAddSchema, session: SessionDep):
     query = select(Task).where(schema.title == Task.title)
     task = await session.execute(query)
     if task.one_or_none():
-        raise HTTPException(
-            status.HTTP_400_BAD_REQUEST, "Задача с таким названием уже существует!"
-        )
+        raise TaskAlreadyExistsException
     task = Task(**schema.model_dump())
     session.add(task)
     await session.commit()
@@ -43,6 +46,14 @@ async def get_task_by_id(task_id: int, session: SessionDep) -> TaskSchema:
             status=result.status,
         )
     else:
-        raise HTTPException(
-            status.HTTP_400_BAD_REQUEST, "Задача с указанным ID не найдена"
-        )
+        raise TaskNotFoundException
+
+
+@router.delete("/{task_id}")
+async def delete_task_by_id(task_id: int, session: SessionDep) -> dict:
+    task = await session.get(Task, task_id)
+    if task:
+        await session.execute(delete(Task).where(Task.id == task_id))
+        return {"status": "Задача удалена"}
+    else:
+        raise TaskNotFoundException
