@@ -1,21 +1,21 @@
+from typing import Optional
 from fastapi import APIRouter
 from core.db import SessionDep
 from sqlalchemy import select, delete
 from models.task import Task
 from schemas.task import TaskAddSchema, TaskSchema
 from api.v1.exceptions import TaskNotFoundException, TaskAlreadyExistsException
-from api.v1.dependencies import GetCurrentUserDep
+from api.v1.dependencies import GetCurrentUserDep, TaskRepositoryDep
 
 router = APIRouter(prefix="/tasks", tags=["Tasks"])
 
 
 @router.get("/")
-async def get_tasks(session: SessionDep, user: GetCurrentUserDep):
+async def get_tasks(
+    user: GetCurrentUserDep, repo: TaskRepositoryDep, status: Optional[str] = None
+):
     """Функция для получения всех задач"""
-
-    query = select(Task).where(Task.user_id == user.id)
-    result = await session.execute(query)
-    tasks = result.scalars().all()
+    tasks = await repo.get_tasks(status=status, user_id=user.id)
     if tasks:
         return tasks
     else:
@@ -23,21 +23,21 @@ async def get_tasks(session: SessionDep, user: GetCurrentUserDep):
 
 
 @router.post("/")
-async def add_task(schema: TaskAddSchema, session: SessionDep, user: GetCurrentUserDep):
+async def create_task(
+    schema: TaskAddSchema,
+    user: GetCurrentUserDep,
+    repo: TaskRepositoryDep,
+):
     """Функция для добавления задачи"""
 
-    query = select(Task).where(schema.title == Task.title, Task.user_id == user.id)
-    task = await session.execute(query)
+    task = repo.get_task_by_id()
     if task.one_or_none():
         raise TaskAlreadyExistsException
-    task = Task(**schema.model_dump(), user_id=user.id)
-    session.add(task)
-    await session.commit()
-    return task
+    return repo.add_task(task_data=schema, user_id=user.id)
 
 
 @router.get("/{task_id}", response_model=TaskSchema)
-async def get_task_by_id(
+async def get_one_task(
     task_id: int, session: SessionDep, user: GetCurrentUserDep
 ) -> TaskSchema:
     query = select(Task).where(Task.id == task_id, Task.user_id == user.id)
