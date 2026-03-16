@@ -1,4 +1,4 @@
-from typing import Annotated
+from typing import Annotated, Optional
 from alembic.util import status
 from fastapi import Depends, Form, HTTPException
 from sqlalchemy import select
