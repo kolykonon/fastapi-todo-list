@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from core.db import SessionDep
-from sqlalchemy import select, delete
+from sqlalchemy import select, delete, update
 from models.task import Task
 from schemas.task import TaskAddSchema, TaskSchema
 from api.v1.exceptions import TaskNotFoundException, TaskAlreadyExistsException
@@ -54,6 +54,21 @@ async def delete_task_by_id(task_id: int, session: SessionDep) -> dict:
     task = await session.get(Task, task_id)
     if task:
         await session.execute(delete(Task).where(Task.id == task_id))
+        await session.commit()
         return {"status": "Задача удалена"}
     else:
         raise TaskNotFoundException
+
+
+@router.put("/{task_id}")
+async def update_task(task_id: int, schema: TaskAddSchema, session: SessionDep):
+    query = select(Task).where(Task.id == task_id)
+    result = await session.execute(query)
+    task = result.one_or_none()
+    if not task:
+        raise TaskNotFoundException
+    update_data = TaskAddSchema.model_dump(exclude_none=True)
+    for key, value in update_data:
+        setattr(task, key, value)
+    session.refresh(task)
+    await session.commit()
