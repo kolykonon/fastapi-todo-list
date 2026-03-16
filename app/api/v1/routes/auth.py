@@ -7,7 +7,7 @@ from sqlalchemy import select
 from fastapi import Depends, HTTPException, status, APIRouter
 from core.security import hash_password
 from utils.jwt import encode_jwt
-from utils import get_current_active_user
+from api.v1.dependencies import GetCurrentUserDep
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
@@ -36,5 +36,5 @@ async def auth_user(user: UserValidateDep):
 
 
 @router.get("/users/me")
-async def get_users_me(user: User = Depends(get_current_active_user)) -> dict:
+async def get_users_me(user: User = GetCurrentUserDep) -> dict:
     return {"email": user.username}
