@@ -1,6 +1,6 @@
 from typing import Optional
 from pydantic import BaseModel, Field
-from models import TaskStatus
+from models.task import TaskStatus
 
 
 class TaskAddSchema(BaseModel):

@@ -1,8 +1,8 @@
 from fastapi import APIRouter, HTTPException, status
-from core import SessionDep
+from core.db import SessionDep
 from sqlalchemy import Sequence, select
-from models import Task
-from schemas import TaskAddSchema, TaskSchema
+from models.task import Task
+from schemas.task import TaskAddSchema, TaskSchema
 
 router = APIRouter(prefix="/tasks", tags=["Tasks"])
 
