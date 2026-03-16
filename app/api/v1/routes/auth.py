@@ -36,5 +36,5 @@ async def auth_user(user: UserValidateDep):
 
 
 @router.get("/users/me")
-async def get_users_me(user: User = GetCurrentUserDep) -> dict:
+async def get_users_me(user: GetCurrentUserDep) -> dict:
     return {"email": user.username}
