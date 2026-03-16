@@ -1,12 +1,14 @@
 from typing import Annotated
 from pydantic import EmailStr
-from schemas import CreateUserSchema, UserSchema, TokenSchema
-from core import SessionDep
-from models import User
+from schemas.token import TokenSchema
+from schemas.user import CreateUserSchema
+from core.db import SessionDep
+from models.user import User
 from sqlalchemy import select
 from fastapi import Depends, HTTPException, status, APIRouter, Form
-from core.utils import hash_password, validate_password, encode_jwt
-from core.utils import get_current_active_user
+from core.security import hash_password, validate_password
+from utils.jwt import encode_jwt
+from utils import get_current_active_user
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 

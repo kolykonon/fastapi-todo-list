@@ -1,8 +1,8 @@
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from core.db import SessionDep
-from schemas import UserSchema
-from core.utils import decode_jwt
+from schemas.user import UserSchema
+from utils import decode_jwt
 from sqlalchemy import select
 from models import User
 from jwt.exceptions import InvalidTokenError

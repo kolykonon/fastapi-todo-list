@@ -4,7 +4,7 @@ from models import Base
 from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
-from core import settings
+from app.core import security
 
 from alembic import context
 
@@ -28,7 +28,7 @@ target_metadata = Base.metadata
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
 
-config.set_main_option("sqlalchemy.url", settings.db_settings.get_db_url)
+config.set_main_option("sqlalchemy.url", security.db_settings.get_db_url)
 
 
 def run_migrations_offline() -> None:
