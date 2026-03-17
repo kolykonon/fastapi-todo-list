@@ -1,7 +1,8 @@
+from models import Task
 from typing import Optional
 from fastapi import APIRouter
 from schemas.task import TaskAddSchema, TaskSchema
-from api.v1.exceptions import TaskNotFoundException, TaskAlreadyExistsException
+from api.v1.exceptions import TaskNotFoundException, AlreadyExistsException
 from api.v1.dependencies import GetCurrentUserDep, TaskRepositoryDep
 
 router = APIRouter(prefix="/tasks", tags=["Tasks"])
@@ -29,7 +30,7 @@ async def create_task(
 
     task = await repo.get_task_by_title(task_title=schema.title, user_id=user.id)
     if task:
-        raise TaskAlreadyExistsException
+        raise AlreadyExistsException(Task.__name__)
     return await repo.add_task(task_data=schema, user_id=user.id)
 
 

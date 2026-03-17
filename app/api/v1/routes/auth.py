@@ -1,31 +1,29 @@
 from api.v1.dependencies import UserValidateDep
 from schemas.token import TokenSchema
-from schemas.user import CreateUserSchema
-from core.db import SessionDep
+from schemas.user import CreateUserSchema, UserSchema
 from models.user import User
-from sqlalchemy import select
-from fastapi import Depends, HTTPException, status, APIRouter
+from fastapi import APIRouter
 from core.security import hash_password
 from utils.jwt import encode_jwt
-from api.v1.dependencies import GetCurrentUserDep
+from api.v1.dependencies import GetCurrentUserDep, AuthRepositoryDep
+from api.v1.exceptions import AlreadyExistsException
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
 
-@router.post("/register/")
-async def register_user(schema: CreateUserSchema, session: SessionDep):
-    query = select(User).where(User.username == schema.username)
-    user = await session.execute(query)
-    if user.scalar_one_or_none():
-        raise HTTPException(
-            status.HTTP_400_BAD_REQUEST, "Пользователь с таким email уже существует!"
-        )
+@router.post("/register/", response_model=UserSchema)
+async def register_user(
+    schema: CreateUserSchema, repo: AuthRepositoryDep
+) -> UserSchema:
+    user = await repo.get_user_by_name(schema.username)
+    if user:
+        raise AlreadyExistsException(User.__name__)
     else:
         hashed_password = hash_password(schema.password)
-        user = User(username=schema.username, password=hashed_password)
-    session.add(user)
-    await session.commit()
-    return {"Ok": True}
+        new_user = await repo.create_user(
+            username=schema.username, password=hashed_password
+        )
+        return new_user
 
 
 @router.post("/login/", response_model=TokenSchema)
