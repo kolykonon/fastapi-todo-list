@@ -33,6 +33,6 @@ async def auth_user(user: UserValidateDep):
     return TokenSchema(access_token=token, token_type="Bearer")
 
 
-@router.get("/users/me")
-async def get_users_me(user: GetCurrentUserDep) -> dict:
-    return {"email": user.username}
+@router.get("/users/me", response_model=UserSchema)
+async def get_users_me(user: GetCurrentUserDep) -> UserSchema:
+    return UserSchema.model_validate(user, from_attributes=True)
