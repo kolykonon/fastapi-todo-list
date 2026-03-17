@@ -9,6 +9,7 @@ from core.security import validate_password
 from core.db import SessionDep
 from models.user import User
 from repositories.task_repository import TaskRepository
+from repositories.auth_repository import AuthRepository
 
 ouath2_scheme = OAuth2PasswordBearer(
     tokenUrl="/auth/login/", scheme_name="JWT Authentication"
@@ -57,12 +58,18 @@ async def get_current_active_user(
     return user
 
 
-async def get_repository(session: SessionDep) -> TaskRepository:
+async def get_task_repository(session: SessionDep) -> TaskRepository:
     return TaskRepository(session)
+
+
+async def get_auth_repository(session: SessionDep) -> AuthRepository:
+    return AuthRepository(session)
 
 
 UserValidateDep = Annotated[User, Depends(validate_auth_user)]
 
 GetCurrentUserDep = Annotated[User, Depends(get_current_active_user)]
 
-TaskRepositoryDep = Annotated[TaskRepository, Depends(get_repository)]
+TaskRepositoryDep = Annotated[TaskRepository, Depends(get_task_repository)]
+
+AuthRepositoryDep = Annotated[AuthRepository, Depends(get_auth_repository)]
