@@ -1,48 +1,75 @@
-from fastapi import APIRouter, HTTPException, status
-from core.db import SessionDep
-from sqlalchemy import Sequence, select
-from models.task import Task
+from typing import Optional
+from fastapi import APIRouter
 from schemas.task import TaskAddSchema, TaskSchema
+from api.v1.exceptions import TaskNotFoundException, TaskAlreadyExistsException
+from api.v1.dependencies import GetCurrentUserDep, TaskRepositoryDep
 
 router = APIRouter(prefix="/tasks", tags=["Tasks"])
 
 
 @router.get("/")
-async def get_tasks(session: SessionDep):
+async def get_tasks(
+    user: GetCurrentUserDep, repo: TaskRepositoryDep, status: Optional[str] = None
+):
     """Функция для получения всех задач"""
-
-    query = select(Task)
-    result = await session.execute(query)
-    return result.scalars().all()
+    tasks = await repo.get_tasks(status=status, user_id=user.id)
+    if tasks:
+        return tasks
+    else:
+        return {"msg": "Задачи не найдены!"}
 
 
 @router.post("/")
-async def add_task(schema: TaskAddSchema, session: SessionDep):
+async def create_task(
+    schema: TaskAddSchema,
+    user: GetCurrentUserDep,
+    repo: TaskRepositoryDep,
+):
     """Функция для добавления задачи"""
 
-    query = select(Task).where(schema.title == Task.title)
-    task = await session.execute(query)
-    if task.one_or_none():
-        raise HTTPException(
-            status.HTTP_400_BAD_REQUEST, "Задача с таким названием уже существует!"
-        )
-    task = Task(**schema.model_dump())
-    session.add(task)
-    await session.commit()
-    return task
+    task = await repo.get_task_by_title(task_title=schema.title, user_id=user.id)
+    if task:
+        raise TaskAlreadyExistsException
+    return await repo.add_task(task_data=schema, user_id=user.id)
 
 
 @router.get("/{task_id}", response_model=TaskSchema)
-async def get_task_by_id(task_id: int, session: SessionDep) -> TaskSchema:
-    result = await session.get(Task, 1)
-    if result:
+async def get_one_task(
+    task_id: int, user: GetCurrentUserDep, repo: TaskRepositoryDep
+) -> TaskSchema:
+    task = await repo.get_task_by_id(task_id=task_id, user_id=user.id)
+    if task:
         return TaskSchema(
-            id=result.id,
-            title=result.title,
-            description=result.description,
-            status=result.status,
+            id=task.id,
+            title=task.title,
+            description=task.description,
+            status=task.status,
         )
     else:
-        raise HTTPException(
-            status.HTTP_400_BAD_REQUEST, "Задача с указанным ID не найдена"
-        )
+        raise TaskNotFoundException
+
+
+@router.delete("/{task_id}")
+async def delete_task_by_id(
+    task_id: int, user: GetCurrentUserDep, repo: TaskRepositoryDep
+) -> dict:
+    task = await repo.get_task_by_id(task_id=task_id, user_id=user.id)
+    if task:
+        deleted = await repo.delete_task_by_id(task_id=task_id, user_id=user.id)
+        return deleted
+    else:
+        raise TaskNotFoundException
+
+
+@router.put("/{task_id}")
+async def update_task(
+    task_id: int,
+    schema: TaskAddSchema,
+    user: GetCurrentUserDep,
+    repo: TaskRepositoryDep,
+):
+    task = await repo.get_task_by_id(task_id=task_id, user_id=user.id)
+    if task:
+        task = await repo.update_task(task=task, schema=schema)
+        return task
+    raise TaskNotFoundException
