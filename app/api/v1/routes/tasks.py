@@ -1,8 +1,5 @@
 from typing import Optional
 from fastapi import APIRouter
-from core.db import SessionDep
-from sqlalchemy import select, delete
-from models.task import Task
 from schemas.task import TaskAddSchema, TaskSchema
 from api.v1.exceptions import TaskNotFoundException, TaskAlreadyExistsException
 from api.v1.dependencies import GetCurrentUserDep, TaskRepositoryDep
@@ -30,20 +27,18 @@ async def create_task(
 ):
     """Функция для добавления задачи"""
 
-    task = repo.get_task_by_id()
-    if task.one_or_none():
+    task = await repo.get_task_by_title(task_title=schema.title, user_id=user.id)
+    if task:
         raise TaskAlreadyExistsException
-    return repo.add_task(task_data=schema, user_id=user.id)
+    return await repo.add_task(task_data=schema, user_id=user.id)
 
 
 @router.get("/{task_id}", response_model=TaskSchema)
 async def get_one_task(
-    task_id: int, session: SessionDep, user: GetCurrentUserDep
+    task_id: int, user: GetCurrentUserDep, repo: TaskRepositoryDep
 ) -> TaskSchema:
-    query = select(Task).where(Task.id == task_id, Task.user_id == user.id)
-    result = await session.execute(query)
-    task = result.scalar_one_or_none()
-    if result:
+    task = await repo.get_task_by_id(task_id=task_id, user_id=user.id)
+    if task:
         return TaskSchema(
             id=task.id,
             title=task.title,
@@ -56,30 +51,25 @@ async def get_one_task(
 
 @router.delete("/{task_id}")
 async def delete_task_by_id(
-    task_id: int, session: SessionDep, user: GetCurrentUserDep
+    task_id: int, user: GetCurrentUserDep, repo: TaskRepositoryDep
 ) -> dict:
-    task = await session.get(Task, task_id)
+    task = await repo.get_task_by_id(task_id=task_id, user_id=user.id)
     if task:
-        await session.execute(delete(Task).where(Task.id == task_id))
-        await session.commit()
-        return {"status": "Задача удалена"}
+        deleted = await repo.delete_task_by_id(task_id=task_id, user_id=user.id)
+        return deleted
     else:
         raise TaskNotFoundException
 
 
 @router.put("/{task_id}")
 async def update_task(
-    task_id: int, schema: TaskAddSchema, session: SessionDep, user: GetCurrentUserDep
+    task_id: int,
+    schema: TaskAddSchema,
+    user: GetCurrentUserDep,
+    repo: TaskRepositoryDep,
 ):
-    query = select(Task).where(Task.id == task_id, Task.user_id == user.id)
-    result = await session.execute(query)
-    task = result.scalar_one_or_none()
+    task = await repo.get_task_by_id(task_id=task_id, user_id=user.id)
     if task:
-        update_data = schema.model_dump(exclude_none=True)
-        for key, value in update_data.items():
-            setattr(task, key, value)
-
-        await session.commit()
-
-        return TaskSchema.model_validate(task, from_attributes=True)
+        task = await repo.update_task(task=task, schema=schema)
+        return task
     raise TaskNotFoundException

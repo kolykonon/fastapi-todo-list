@@ -1,6 +1,6 @@
-from sqlalchemy import select
+from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from schemas.task import TaskAddSchema
+from schemas.task import TaskAddSchema, TaskSchema
 from models.task import Task
 from typing import Optional, Sequence
 
@@ -32,7 +32,23 @@ class TaskRepository:
         await self.session.commit()
         return new_task
 
-    async def get_task_by_title(self, task_title: str, user_id: int):
+    async def get_task_by_title(self, task_title: str, user_id: int) -> Optional[Task]:
         query = select(Task).where(Task.title == task_title, Task.user_id == user_id)
         result = await self.session.execute(query)
         return result.scalar_one_or_none()
+
+    async def delete_task_by_id(self, task_id: int, user_id: int) -> dict:
+        query = delete(Task).where(Task.id == task_id, Task.user_id == user_id)
+        await self.session.execute(query)
+        await self.session.commit()
+        return {"msg": "Задача удалена"}
+
+    async def update_task(self, task: Task, schema: TaskSchema) -> TaskSchema:
+        update_data = schema.model_dump(exclude_none=True)
+
+        for key, value in update_data.items():
+            setattr(task, key, value)
+
+        await self.session.commit()
+
+        return TaskSchema.model_validate(task, from_attributes=True)
