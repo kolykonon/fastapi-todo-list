@@ -11,7 +11,6 @@ from app.models.user import User
 from app.repositories.task_repository import TaskRepository
 from app.repositories.auth_repository import AuthRepository
 
-1
 ouath2_scheme = OAuth2PasswordBearer(
     tokenUrl="/auth/login/", scheme_name="JWT Authentication"
 )
