@@ -23,6 +23,8 @@ services:
       - "8000:8000"
     environment:
       - PYTHONPATH=/app
+    volumes:
+      - ./app:/code/app
     depends_on:
       postgres:
         condition: service_healthy
