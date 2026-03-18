@@ -1,4 +1,6 @@
-from pydantic import BaseModel, ConfigDict, EmailStr
+from pydantic import BaseModel, ConfigDict, Field, field_validator
+import re
+import string
 
 
 class CreateUserSchema(BaseModel):
@@ -11,5 +13,13 @@ class UserSchema(BaseModel):
 
     id: int
     username: str
-    password: str
+    password: str = Field(min_length=8)
     is_active: bool = True
+
+    @field_validator("password")
+    def validate_password(cls, v: str):
+        if not re.search(r"\d", v):
+            raise ValueError("Пароль должен содержать хотя бы одну цифру")
+        if not re.search(r'[!@#$^&*(),.?":{}|<>_]', v):
+            raise ValueError("Пароль должен содержать хотя бы один специальный символ")
+        return v
