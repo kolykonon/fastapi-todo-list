@@ -11,5 +11,6 @@ if TYPE_CHECKING:  # Чтобы избежать циклического имп
 class User(Base, IDMixin, TimeStampMixin):
     username: Mapped[str] = mapped_column(unique=True, nullable=False)
     password: Mapped[str] = mapped_column(nullable=False)
+    email: Mapped[str] = mapped_column(nullable=True, unique=True)
     tasks: Mapped[List["Task"]] = relationship("Task", back_populates="user")
     is_active: Mapped[bool] = mapped_column(default=True)
