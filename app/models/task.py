@@ -1,4 +1,5 @@
-from sqlalchemy import String, Text
+from datetime import datetime
+from sqlalchemy import DateTime, String, Text
 from typing import TYPE_CHECKING
 from app.mixins import TimeStampMixin, IDMixin
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -28,7 +29,10 @@ class Task(Base, IDMixin, TimeStampMixin):
         default=TaskStatus.IN_PROGRESS,
         server_default=TaskStatus.IN_PROGRESS,
     )
-
+    due_date: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=True)
+    completed_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
 
     user: Mapped["User"] = relationship("User", back_populates="tasks")
