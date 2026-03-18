@@ -3,8 +3,7 @@ set -e
 
 echo "================================="
 echo "Запуск миграций"
-echo "================================="
-alembic revision --autogenerate -m 'Initial'
+echo "=================================="
 alembic upgrade head
 
 echo "================================="
