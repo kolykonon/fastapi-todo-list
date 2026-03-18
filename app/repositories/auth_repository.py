@@ -1,9 +1,9 @@
 from typing import Optional
 from sqlalchemy import select
-from models.user import User
-from core.db import SessionDep
+from app.models.user import User
+from app.core.db import SessionDep
 from sqlalchemy.ext.asyncio import AsyncSession
-from schemas.user import CreateUserSchema
+from app.schemas.user import CreateUserSchema
 
 
 class AuthRepository:

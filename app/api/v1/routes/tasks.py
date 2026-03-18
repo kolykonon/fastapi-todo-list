@@ -1,9 +1,9 @@
-from models import Task
+from app.models import Task
 from typing import Optional
 from fastapi import APIRouter
-from schemas.task import TaskAddSchema, TaskSchema
-from api.v1.exceptions import TaskNotFoundException, AlreadyExistsException
-from api.v1.dependencies import GetCurrentUserDep, TaskRepositoryDep
+from app.schemas.task import TaskAddSchema, TaskSchema
+from app.api.v1.exceptions import TaskNotFoundException, AlreadyExistsException
+from app.api.v1.dependencies import GetCurrentUserDep, TaskRepositoryDep
 
 router = APIRouter(prefix="/tasks", tags=["Tasks"])
 

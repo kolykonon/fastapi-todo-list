@@ -1,0 +1,40 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: fastapi_todo_postgres
+    restart: always
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 15s
+    env_file:
+      - .env
+    networks:
+      - todo_network
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONPATH=/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+    env_file:
+      - .env
+    networks:
+      - todo_network
+volumes:
+  pgdata:
+    name: todo_pgdata
+
+networks:
+  todo_network:
+    driver: bridge
+    name: todo_network

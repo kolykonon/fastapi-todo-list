@@ -1,12 +1,12 @@
-from api.v1.dependencies import UserValidateDep
-from schemas.token import TokenSchema
-from schemas.user import CreateUserSchema, UserSchema
-from models.user import User
+from app.api.v1.dependencies import UserValidateDep
+from app.schemas.token import TokenSchema
+from app.schemas.user import CreateUserSchema, UserSchema
+from app.models.user import User
 from fastapi import APIRouter
-from core.security import hash_password
-from utils.jwt import encode_jwt
-from api.v1.dependencies import GetCurrentUserDep, AuthRepositoryDep
-from api.v1.exceptions import AlreadyExistsException
+from app.core.security import hash_password
+from app.utils.jwt import encode_jwt
+from app.api.v1.dependencies import GetCurrentUserDep, AuthRepositoryDep
+from app.api.v1.exceptions import AlreadyExistsException
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 

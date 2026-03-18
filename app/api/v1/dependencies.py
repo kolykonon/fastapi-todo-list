@@ -4,13 +4,14 @@ from fastapi import Depends, Form, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from jwt import InvalidTokenError
 from sqlalchemy import select
-from utils.jwt import decode_jwt
-from core.security import validate_password
-from core.db import SessionDep
-from models.user import User
-from repositories.task_repository import TaskRepository
-from repositories.auth_repository import AuthRepository
+from app.utils.jwt import decode_jwt
+from app.core.security import validate_password
+from app.core.db import SessionDep
+from app.models.user import User
+from app.repositories.task_repository import TaskRepository
+from app.repositories.auth_repository import AuthRepository
 
+1
 ouath2_scheme = OAuth2PasswordBearer(
     tokenUrl="/auth/login/", scheme_name="JWT Authentication"
 )

@@ -1,8 +1,8 @@
 from sqlalchemy import String, Text
 from typing import TYPE_CHECKING
-from mixins import TimeStampMixin, IDMixin
+from app.mixins import TimeStampMixin, IDMixin
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from models import Base
+from app.models import Base
 from sqlalchemy import ForeignKey
 import enum
 

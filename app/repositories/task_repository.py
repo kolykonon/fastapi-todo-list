@@ -1,7 +1,7 @@
 from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from schemas.task import TaskAddSchema, TaskSchema
-from models.task import Task
+from app.schemas.task import TaskAddSchema, TaskSchema
+from app.models.task import Task
 from typing import Optional, Sequence
 
 

@@ -1,5 +1,5 @@
-from models.base import Base
-from models.task import Task, TaskStatus
-from models.user import User
+from app.models.base import Base
+from app.models.task import Task, TaskStatus
+from app.models.user import User
 
 __all__ = ("Base", "Task", "TaskStatus", "User")
