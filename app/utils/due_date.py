@@ -1,4 +1,4 @@
-from datetime import datetime, date
+from datetime import datetime, date, timezone
 from typing import Optional, Union
 
 
@@ -28,20 +28,20 @@ class DueDate:
     def is_overdue(self) -> bool:
         if not self._value:
             return False
-        return datetime.now() < self.value
+        return datetime.now(timezone.utc) > self.value
 
     @property
     def days_until(self) -> Optional[int]:
         if not self._value:
             return None
-        delta = self._value - datetime.now()
+        delta = self._value - datetime.now(timezone.utc)
         return delta.days
 
     @property
     def days_overdue(self) -> Optional[int]:
         if not self._value:
             return None
-        overdue = datetime.now() - self._value
+        overdue = datetime.now(timezone.utc) - self._value
         return overdue.days
 
     def __str__(self):

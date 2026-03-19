@@ -1,9 +1,9 @@
-from typing import Optional
+from typing import Annotated, Optional
+from fastapi import Depends
 from sqlalchemy import select
 from app.models.user import User
 from app.core.db import SessionDep
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.schemas.user import CreateUserSchema
 
 
 class AuthRepository:
@@ -21,3 +21,10 @@ class AuthRepository:
         self.session.add(new_user)
         await self.session.commit()
         return new_user
+
+
+def get_auth_repositoty(session: SessionDep):
+    return AuthRepository(session)
+
+
+AuthRepositoryDep = Annotated[AuthRepository, Depends(get_auth_repositoty)]

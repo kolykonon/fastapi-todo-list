@@ -1,8 +1,7 @@
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from typing import TYPE_CHECKING, List
 from app.models import Base
-from app.mixins import IDMixin, TimeStampMixin
-from pydantic import EmailStr
+from app.models.mixins import IDMixin, TimeStampMixin
 
 if TYPE_CHECKING:  # Чтобы избежать циклического импорта
     from app.models import Task
